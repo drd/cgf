@@ -1,10 +1,13 @@
 var devicePixelRatio = window.devicePixelRatio || 1;
 
 // the Graphics Context abstraction
-function GC(canvas) {
+function GC(canvas, options) {
+    options = options || {};
     this.canvas = canvas;
     this.context = canvas.getContext('2d');
-    this.retinafy(canvas);
+    if (options.retinafy !== false) {
+        this.retinafy(canvas);
+    }
     this.width = canvas.width;
     this.height = canvas.height;
 };
@@ -50,13 +53,7 @@ GC.prototype.clear = function() {
 };
 
 
-var base = new GC(document.getElementById('canvas')),
-    overlay = new GC(document.getElementById('overlay'));
-
-
-var mandeled = false;
-
-function Mandel(gc, options) {
+function Fractal(gc, options) {
     this.gc = gc;
     options = options || {};
     this.x1 = options.x1 || -2;
@@ -66,7 +63,40 @@ function Mandel(gc, options) {
     this.maxIter = options.maxIter || 128;
 }
 
-Mandel.prototype.draw = function mandel() {
+// it'd be keen to precalc these
+Fractal.prototype.color = function color(x, y, iter) {
+    this.gc.rgb(127 - ((iter * 4) % 127), 127 + ((127 + iter) % 128), 127 - ((iter * 3) % 127));
+    this.gc.putPixel(x, y);
+};
+
+Fractal.prototype.screenToWorld = function screenToWorld(x, y) {
+    // scale screen coordinates into world coordinates, accounting
+    // for the ratio of the graphics context
+    var worldX = x * this.gc.ratio * (this.x2 - this.x1) /
+        this.gc.width + this.x1,
+        worldY = y * this.gc.ratio * (this.y2 - this.y1) /
+        this.gc.height + this.y1;
+
+    return [worldX, worldY];
+};
+
+Fractal.prototype.worldToScreen = function worldToScreen(x, y) {
+    // scale world coordinates into screen coordinates
+    var screenX = (x - this.x1) * this.gc.width  /
+        (this.x2 - this.x1),
+        screenY = (y - this.y1) * this.gc.height /
+        (this.y2 - this.y1);
+
+    return [screenX, screenY];
+};
+
+
+function Mandel() {
+    Fractal.apply(this, arguments);
+};
+Mandel.prototype = new Fractal();
+
+Mandel.prototype.draw = function draw() {
     var dx = (this.x2 - this.x1)/this.gc.width,
         dy = (this.y2 - this.y1)/this.gc.height,
         x = this.x1,
@@ -86,8 +116,7 @@ Mandel.prototype.draw = function mandel() {
                 zy = 2 * zx * zy + y;
                 zx = zx2 - zy2 + x;
             }
-            this.gc.rgb(k * 2, k * 2, k * 2);
-            this.gc.putPixel(i, j);
+            this.color(i, j, k);
 
             y += dy;
         }
@@ -114,27 +143,79 @@ Mandel.prototype.iterate = function iter(x, y) {
     return points;
 };
 
-Mandel.prototype.screenToWorld = function screenToWorld(x, y) {
-    // scale screen coordinates into world coordinates, accounting
-    // for the ratio of the graphics context
-    var worldX = x * this.gc.ratio * (this.x2 - this.x1) /
-                     this.gc.width + this.x1,
-        worldY = y * this.gc.ratio * (this.y2 - this.y1) /
-                     this.gc.height + this.y1;
 
-    return [worldX, worldY];
+function Julia(gc, options) {
+    Fractal.apply(this, arguments);
+    this.re = options.re;
+    this.im = options.im;
+};
+Julia.prototype = new Fractal();
+
+Julia.prototype.draw = function draw() {
+    var dx = (this.x2 - this.x1)/this.gc.width,
+        dy = (this.y2 - this.y1)/this.gc.height,
+        x = this.x1,
+        y = this.y1,
+        re = this.re,
+        im = this.im,
+        i, j, k;
+
+    for (i = 0; i < this.gc.width; i++) {
+        for (j = 0; j < this.gc.height; j++) {
+            var zx = x,
+                zy = y;
+            for (k = 0; k < this.maxIter; k++) {
+                var zx2 = zx * zx,
+                    zy2 = zy * zy;
+                if (zx2 + zy2 > 4) {
+                    break;
+                }
+                zy = 2 * zx * zy + im;
+                zx = zx2 - zy2 + re;
+            }
+            this.color(i, j, k);
+
+            y += dy;
+        }
+
+        y = this.y1;
+        x += dx;
+    }
 };
 
-Mandel.prototype.worldToScreen = function worldToScreen(x, y) {
-    // scale world coordinates into screen coordinates
-    var screenX = (x - this.x1) * this.gc.width  /
-                  (this.x2 - this.x1),
-        screenY = (y - this.y1) * this.gc.height /
-                  (this.y2 - this.y1);
+Julia.prototype.color = function(x, y, iter) {
+    var c = Math.round(iter / this.maxIter * 255);
 
-    return [screenX, screenY];
+    this.gc.rgba(c, c, c, 0.3);
+    this.gc.putPixel(x, y);
 };
 
+Julia.prototype.iterate = function iter(x, y) {
+    var zx = x,
+        zy = y,
+        re = this.re,
+        im = this.im,
+        points = [];
+
+    for (k = 0; k < this.maxIter; k++) {
+        points.push([zx, zy]);
+        var zx2 = zx * zx,
+            zy2 = zy * zy;
+        if (zx2 + zy2 > 4) {
+            break;
+        }
+        zy = 2 * zx * zy + im;
+        zx = zx2 - zy2 + re;
+    }
+    return points;
+};
+
+
+var base = new GC(document.getElementById('canvas')),
+    overlay = new GC(document.getElementById('overlay')),
+    julia = new GC(document.getElementById('julia'), {
+        retinafy: false
+    });
 
 
 var mandel = new Mandel(base);
@@ -146,16 +227,26 @@ overlay.canvas.addEventListener('mousemove', function(event) {
     overlay.clear();
     for (i = 0; i < points.length; i++) {
         var p = mandel.worldToScreen(points[i][0], points[i][1]);
-        overlay.rgba(224, 224, 224, 0.3);
+        overlay.rgba(224, 224, 224, i / (2 * points.length));
         overlay.context.beginPath();
-        overlay.context.arc(p[0], p[1], 20, 0, Math.PI * 2);
+        overlay.context.arc(p[0], p[1], 10, 0, Math.PI * 2);
         overlay.context.fill();
         overlay.rgb(255, 64, 64);
         overlay.putPixel(p[0], p[1]);
     }
+
+    var jul = new Julia(julia, {
+        x1: -2, x2: 2,
+        y1: -2, y2: 2,
+        re: coords[0],
+        im: coords[1],
+        maxIter: 64
+    });
+    julia.clear();
+    jul.draw();
 });
 
 setTimeout(function() {
-    mandel.draw();
+    mandel.draw({maxIter: 255});
     mandeled = true;
 }, 0);
