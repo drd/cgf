@@ -1,50 +1,17 @@
-# Computer Graphics Fundamentals in HTML5 Canvas
+# Computer Graphics Fundamentals
 
+This is a repo where I will play with Canvas and computer graphics in both code and text. The goal is to write a series of posts explaining some of the basics (and not-so-basics) of computer graphics in the most accessible development environment available today: the web browser.
 
-## Introduction
+# Expected content
 
-### Why Computer Graphics Fundamentals?
+- Fundamentals
+-- 2d
+-- 3d
+- Fractals
+- Animation
 
-### Why Canvas?
+.. more to come
 
-### Goals of the series
+# Suggestions
 
-
-## HTML5 Canvas
-
-### How to make a canvas
-
-### What primitives are afforded by canvas API?
-
-
-## Building a toolkit to explore CGF
-
-### Boilerplate
-
-### How should we implement putPixel?
-
-### Fun with putPixel!
-
-
-## Drawing Lines
-
-### The naive method
-
-### Bresenham's algorithm
-
-### Wu antialiasing
-
-### Better antialiasing?
-
-
-## Drawing other shapes
-
-### Circles
-
-### Ovals
-
-### Splines?
-
-
-## Filling
-
+If you're actually reading this, wow! And, if you have any questions about computer graphics, I will try to answer them. There's a lot I don't know much about, but I'm game to at least try :)
