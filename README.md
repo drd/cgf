@@ -5,8 +5,8 @@ This is a repo where I will play with Canvas and computer graphics in both code 
 # Expected content
 
 - Fundamentals
--- 2d
--- 3d
+ - 2d
+ - 3d
 - Fractals
 - Animation
 
