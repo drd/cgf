@@ -1,26 +1,26 @@
 {
-    "name": "cgf",
-    "version": "0.0.1",
-    "description": "a module exploring computer graphics fundamentals with HTML5 canvas",
-    "keywords": [
-        "graphics",
-        "fundamentals",
-        "canvas"
-    ],
-    "license": "MIT",
-    "author": {
-        "name": "Eric O'Connell",
-        "email": "eric.oconnell@idealist.org"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/drd/cgf"
-    },
-    "dependencies": {
-    },
-    "devDependencies": {
-        "grunt-cli": "~0.1",
-        "browserify": "~3.2.0",
-        "grunt-browserify": "jmreidy/grunt-browserify"
-    }
+  "name": "cgf",
+  "version": "0.0.1",
+  "description": "a module exploring computer graphics fundamentals with HTML5 canvas",
+  "keywords": [
+    "graphics",
+    "fundamentals",
+    "canvas"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "Eric O'Connell",
+    "email": "eric.oconnell@idealist.org"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/drd/cgf"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "grunt-cli": "~0.1",
+    "browserify": "~3.2.0",
+    "grunt-browserify": "jmreidy/grunt-browserify",
+    "grunt-contrib-connect": "~0.5.0"
+  }
 }
