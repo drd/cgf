@@ -1,9 +1,13 @@
 module.exports = function(grunt) {
     grunt.initConfig({
         browserify: {
-            www: {
+            playground: {
                 src: 'src/playground.js',
                 dest: 'www/index.js'
+            },
+            torus: {
+                src: 'src/torus.js',
+                dest: 'www/torus.js'
             }
         },
 
