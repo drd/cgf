@@ -16,14 +16,25 @@ module.exports = function(grunt) {
                 options: {
                     port: 8000,
                     base: 'www',
-                    keepalive: true
+                    keepalive: true,
+                    livereload: true
                 }
+            }
+        },
+        watch: {
+            js: {
+                options: {
+                    livereload: true
+                },
+                files: 'src/**/*.js',
+                tasks: ['browserify']
             }
         }
     });
 
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-connect');
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
     grunt.registerTask('default', ['browserify']);
     grunt.registerTask('server', ['browserify', 'connect']);
